@@ -1,5 +1,10 @@
 FBL.ns(function() { with (FBL) { 
 
+Components.utils.import("resource://firebug/firebug-trace-service.js");
+var AMFXTrace = traceConsoleService.getTracer("extensions.firebug");
+
+AMFXTrace.sysout("AMFXTrace",AMFXTrace);
+
 //	************************************************************************************************
 //	Constants
 
@@ -58,11 +63,12 @@ Firebug.AMFExplorer = extend(Firebug.Module,
 		Firebug.NetMonitor.addListener(this.netListener);
 		
 		// Debug : Open new FB Tracing Console window for "extensions.amfexplorer" domain.
-		Firebug.TraceModule.openConsole("extensions.amfexplorer");
+		//Firebug.TraceModule.openConsole("extensions.amfexplorer"); 
 	},
 	
 	shutdown: function()
 	{
+
 		Firebug.Module.shutdown.apply(this, arguments);
 		
 		// Unregister cache listener
@@ -139,6 +145,7 @@ Firebug.AMFExplorer = extend(Firebug.Module,
 		if (type == 'object' && object instanceof String)
 			type = 'string';
 		
+
 		for (var i = 0; i < reps.length; ++i)
 		{
 			var rep = reps[i];
@@ -374,7 +381,7 @@ NetListener.prototype =
 		// Debug
 		if (AMFXTrace.DBG_NETLISTENER)
 			AMFXTrace.sysout("netListener.onResponseBody: " + (file ? file.href : ""), file);
-			
+
 		 if (AMFUtils.isAmfRequest(file.request)) {
 		 	try {
 		 		var cacheKey = AMFUtils.getCacheKey(file.request);
@@ -466,6 +473,7 @@ Firebug.AMFViewerModel.AMFRequest = extend(Firebug.Module,
 		}
 		
 		if (file.requestAMF) {
+            AMFXTrace.sysout("amfRequestViewer.requestAMF", file.requestAMF);
 			Firebug.AMFViewerModel.Tree.tag.replace(
 					{object: file.requestAMF}, tabBody);
 		}	
@@ -792,14 +800,27 @@ Firebug.AMFViewerModel.Tree = domplate(Firebug.Rep,
 
 	addMember: function(object, type, props, name, value, level)
 	{
+        
 		var rep = Firebug.AMFExplorer.getRep(value);	// do this first in case a call to instanceof reveals contents
 		var tag = rep.shortTag ? rep.shortTag : rep.tag;
 
-		var valueType = typeof(value);
-		var hasChildren = hasProperties(value) && !(value instanceof ErrorCopy) &&
-			(valueType == "function" || (valueType == "object" && value != null)
-				|| (valueType == "string" && value.length > Firebug.stringCropLength));
 
+        
+
+		var valueType = typeof(value);
+
+        var hasProp = hasProperties(value);
+
+        var notErrorCopy = !(value instanceof FirebugReps.ErrorCopy);
+
+        var notNullObject = (valueType == "object" && value != null);
+
+        var longString = value.length > Firebug.stringCropLength;
+
+		var hasChildren = hasProp && notErrorCopy &&
+			(valueType == "function" || notNullObject
+				|| (valueType == "string" && longString));
+       
 		// Special case for "arguments", which is not enumerable by for...in statement
 		// and so, hasProperties always returns false.
 		if (!hasChildren && value) // arguments will never be falsy if the arguments exist
@@ -893,6 +914,7 @@ Firebug.AMFViewerModel.Utils =
 		this.amfDeserializer.initialize(ss);
 		var obj = this.amfDeserializer.readMessage();
 		
+
 		return obj;
 	},
 	
@@ -921,6 +943,7 @@ Firebug.AMFViewerModel.Utils =
 		this.amfDeserializer.initialize(ss);
 		var obj = this.amfDeserializer.readMessage();
 		
+
 		return obj;
 	},
 	

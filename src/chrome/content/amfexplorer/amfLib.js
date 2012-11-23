@@ -2,6 +2,13 @@ function AMFExplorerAMFLib() {}
 
 (function() { with (FBL) { 
 
+Components.utils.import("resource://firebug/firebug-trace-service.js");
+var AMFXTrace = traceConsoleService.getTracer("extensions.firebug");
+
+
+const Cc = Components.classes;
+const Ci = Components.interfaces;
+
 const NS_SEEK_SET = 0;
 const NS_SEEK_CUR = 1;
 const NS_SEEK_END = 2;

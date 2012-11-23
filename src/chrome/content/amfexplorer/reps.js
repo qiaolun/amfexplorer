@@ -202,11 +202,11 @@ Firebug.AMFExplorer.registerRep(
 		FirebugReps.StyleSheet,
 		FirebugReps.Event,
 		FirebugReps.SourceLink,
-		FirebugReps.SourceFile,
+		// FirebugReps.SourceFile, //
 		FirebugReps.StackTrace,
 		FirebugReps.StackFrame,
-		FirebugReps.jsdStackFrame,
-		FirebugReps.jsdScript,
+		// FirebugReps.jsdStackFrame, //
+		// FirebugReps.jsdScript, //
 		FirebugReps.NetFile,
 		FirebugReps.Property,
 		FirebugReps.Except,		
